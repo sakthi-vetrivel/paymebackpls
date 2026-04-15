@@ -160,16 +160,20 @@ export async function POST(request: NextRequest) {
 
     // Store receipt
     const id = nanoid();
+    const description = formData.get("description") as string | null;
+
     const receipt: Receipt = {
       id,
       payerName: payerName.trim(),
       payerVenmo: payerVenmo?.trim() || "",
+      description: description?.trim().slice(0, 200) || undefined,
       items,
       tax,
       tip,
       subtotal,
       total,
       createdAt: new Date().toISOString(),
+      paidBy: [],
     };
 
     await setReceipt(receipt);

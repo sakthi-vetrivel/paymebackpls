@@ -65,7 +65,16 @@ export default function ItemRow({ item, userName, onClaim, disabled }: ItemRowPr
 
   return (
     <div
-      className={`transition-all duration-200 ${
+      role="button"
+      tabIndex={cannotClaim || isDisabled ? -1 : 0}
+      aria-label={`${item.name} ${formatCurrency(item.price)}${myClaim ? ", claimed" : ""}${cannotClaim ? ", fully claimed" : ""}`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleRowTap();
+        }
+      }}
+      className={`transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[var(--text)] focus-visible:ring-offset-2 ${
         cannotClaim
           ? "border-b border-[var(--border-light)] opacity-35"
           : myClaim
@@ -115,9 +124,17 @@ export default function ItemRow({ item, userName, onClaim, disabled }: ItemRowPr
           <span className="text-[15px] font-medium tabular-nums">
             {formatCurrency(item.price)}
           </span>
-          {loading && (
+          {loading ? (
             <span className="text-[11px] text-[var(--text-tertiary)]">...</span>
-          )}
+          ) : myClaim ? (
+            <span className="w-5 h-5 flex items-center justify-center rounded-full bg-[var(--text)] text-white text-[12px] leading-none" aria-hidden="true">
+              &#10003;
+            </span>
+          ) : !cannotClaim ? (
+            <span className="w-5 h-5 flex items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-tertiary)] text-[14px] leading-none" aria-hidden="true">
+              +
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -130,7 +147,7 @@ export default function ItemRow({ item, userName, onClaim, disabled }: ItemRowPr
               key={n}
               onClick={(e) => { e.stopPropagation(); setShowCustom(false); handleClaim(1 / n); }}
               disabled={isDisabled}
-              className={`text-[13px] font-medium w-8 h-8 rounded-full border transition-colors ${
+              className={`text-[13px] font-medium w-11 h-11 rounded-full border transition-colors ${
                 currentSplitN === n && !showCustom
                   ? "bg-[var(--text)] text-white border-[var(--text)]"
                   : "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--text)] hover:text-white hover:border-[var(--text)]"
@@ -142,7 +159,7 @@ export default function ItemRow({ item, userName, onClaim, disabled }: ItemRowPr
           {!showCustom ? (
             <button
               onClick={(e) => { e.stopPropagation(); setShowCustom(true); setCustomN(currentSplitN > 6 ? String(currentSplitN) : ""); }}
-              className={`text-[13px] font-medium w-8 h-8 rounded-full border transition-colors ${
+              className={`text-[13px] font-medium w-11 h-11 rounded-full border transition-colors ${
                 currentSplitN > 6
                   ? "bg-[var(--text)] text-white border-[var(--text)]"
                   : "border-[var(--border)] text-[var(--text-tertiary)] hover:bg-[var(--text)] hover:text-white hover:border-[var(--text)]"
@@ -176,7 +193,7 @@ export default function ItemRow({ item, userName, onClaim, disabled }: ItemRowPr
                 }
                 setShowCustom(false);
               }}
-              className="w-12 h-8 text-[13px] font-medium text-center rounded-full border border-[var(--text)] bg-white focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-12 h-11 text-[13px] font-medium text-center rounded-full border border-[var(--text)] bg-white focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="#"
             />
           )}

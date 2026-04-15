@@ -14,12 +14,14 @@ export interface Receipt {
   id: string;
   payerName: string;
   payerVenmo: string;
+  description?: string;
   items: ReceiptItem[];
   tax: number;
   tip: number;
   subtotal: number;
   total: number;
   createdAt: string;
+  paidBy?: string[]; // names of people who marked as paid
 }
 
 export function claimedFraction(item: ReceiptItem): number {

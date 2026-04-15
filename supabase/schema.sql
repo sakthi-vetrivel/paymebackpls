@@ -8,11 +8,13 @@ create table if not exists receipts (
   creator_id uuid references auth.users(id) on delete set null,
   payer_name text not null,
   payer_venmo text not null,
+  description text,
   items jsonb not null default '[]',
   tax numeric(10,2) not null default 0,
   tip numeric(10,2) not null default 0,
   subtotal numeric(10,2) not null default 0,
   total numeric(10,2) not null default 0,
+  paid_by jsonb not null default '[]',
   created_at timestamptz not null default now(),
   expires_at timestamptz not null default (now() + interval '7 days')
 );

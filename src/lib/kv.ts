@@ -6,11 +6,13 @@ interface ReceiptRow {
   creator_id: string | null;
   payer_name: string;
   payer_venmo: string;
+  description: string | null;
   items: Receipt["items"];
   tax: number;
   tip: number;
   subtotal: number;
   total: number;
+  paid_by: string[] | null;
   created_at: string;
   expires_at: string;
 }
@@ -20,12 +22,14 @@ function rowToReceipt(row: ReceiptRow): Receipt {
     id: row.id,
     payerName: row.payer_name,
     payerVenmo: row.payer_venmo,
+    description: row.description || undefined,
     items: row.items,
     tax: Number(row.tax),
     tip: Number(row.tip),
     subtotal: Number(row.subtotal),
     total: Number(row.total),
     createdAt: row.created_at,
+    paidBy: row.paid_by || [],
   };
 }
 
@@ -50,11 +54,13 @@ export async function setReceipt(receipt: Receipt): Promise<void> {
     id: receipt.id,
     payer_name: receipt.payerName,
     payer_venmo: receipt.payerVenmo,
+    description: receipt.description || null,
     items: receipt.items,
     tax: receipt.tax,
     tip: receipt.tip,
     subtotal: receipt.subtotal,
     total: receipt.total,
+    paid_by: receipt.paidBy || [],
     created_at: receipt.createdAt,
     expires_at: expiresAt,
   });

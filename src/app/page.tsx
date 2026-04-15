@@ -10,6 +10,7 @@ export default function Home() {
   const [step, setStep] = useState<Step>("upload");
   const [payerName, setPayerName] = useState("");
   const [payerVenmo, setPayerVenmo] = useState("");
+  const [description, setDescription] = useState("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [items, setItems] = useState<ReceiptItem[]>([]);
   const [tax, setTax] = useState(0);
@@ -51,6 +52,7 @@ export default function Home() {
     formData.append("image", fileDataRef.current);
     formData.append("payerName", payerName.trim());
     formData.append("payerVenmo", payerVenmo.trim());
+    if (description.trim()) formData.append("description", description.trim());
 
     try {
       const res = await fetch("/api/scan", { method: "POST", body: formData });
@@ -116,6 +118,7 @@ export default function Home() {
         body: JSON.stringify({
           payerName: payerName.trim(),
           payerVenmo: payerVenmo.trim(),
+          description: description.trim() || undefined,
           items: items.map((item, idx) => ({
             id: idx,
             name: item.name,
@@ -158,6 +161,7 @@ export default function Home() {
     setError("");
     setShareUrl("");
     setPreview(null);
+    setDescription("");
     fileDataRef.current = null;
     if (fileRef.current) fileRef.current.value = "";
   }
@@ -214,6 +218,19 @@ export default function Home() {
                 value={payerVenmo}
                 onChange={(e) => setPayerVenmo(e.target.value)}
                 placeholder="@alex-smith"
+                className="w-full py-3.5 border-b border-[var(--border)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-tertiary)]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
+                What&apos;s this for?
+              </label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Dinner at Spago"
                 className="w-full py-3.5 border-b border-[var(--border)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-tertiary)]"
               />
             </div>
@@ -309,7 +326,7 @@ export default function Home() {
             </div>
 
             {showReconciliationWarning && (
-              <div className="text-[13px] text-[#92600A] py-3 px-4 border border-[#92600A]/20 rounded bg-amber-50/50">
+              <div className="text-[13px] text-[var(--warning)] py-3 px-4 border border-[var(--warning)]/20 rounded bg-amber-50/50">
                 Items total ({formatCurrency(itemsSum)}) differs from receipt subtotal ({formatCurrency(subtotal)}) by {formatCurrency(reconciliationDiff)}.
               </div>
             )}
