@@ -150,7 +150,7 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-[family-name:var(--font-instrument-serif)] text-[22px] font-normal text-[var(--text)]">
-            pay{payerName || "me"}backpls
+            pay<span className="font-bold underline">{payerName || "me"}</span>backpls
           </h1>
           <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
             Split the bill, keep the friendship.
