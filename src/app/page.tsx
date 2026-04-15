@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Receipt, ReceiptItem, formatCurrency } from "@/lib/receipt";
+import SavePhonePrompt from "@/components/SavePhonePrompt";
 
 type Step = "upload" | "review" | "share";
 
@@ -17,10 +18,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shareUrl, setShareUrl] = useState("");
+  const [receiptId, setReceiptId] = useState("");
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const fileDataRef = useRef<File | null>(null);
+  const [hasAccount, setHasAccount] = useState(false);
+
+  useEffect(() => {
+    setHasAccount(!!localStorage.getItem("pmbp-user"));
+  }, []);
 
   const itemsSum = items.reduce((s, i) => s + i.price, 0);
   const reconciliationDiff = Math.abs(itemsSum - subtotal);
@@ -116,6 +123,7 @@ export default function Home() {
 
       const url = `${window.location.origin}/s/${data.receipt.id}`;
       setShareUrl(url);
+      setReceiptId(data.receipt.id);
       setStep("share");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -155,6 +163,14 @@ export default function Home() {
           <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
             Split the bill, keep the friendship.
           </p>
+          {hasAccount && (
+            <a
+              href="/receipts"
+              className="inline-block text-[12px] text-[var(--text-secondary)] mt-2 underline underline-offset-2 hover:text-[var(--text)] transition-colors"
+            >
+              My Receipts
+            </a>
+          )}
         </div>
 
         {error && (
@@ -412,6 +428,8 @@ export default function Home() {
                 Share Link
               </button>
             )}
+
+            <SavePhonePrompt receiptId={receiptId} />
 
             <button
               onClick={reset}
