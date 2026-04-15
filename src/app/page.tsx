@@ -21,6 +21,7 @@ export default function Home() {
   const [receiptId, setReceiptId] = useState("");
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [printReveal, setPrintReveal] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const fileDataRef = useRef<File | null>(null);
   const [hasAccount, setHasAccount] = useState(false);
@@ -29,12 +30,20 @@ export default function Home() {
     setHasAccount(!!localStorage.getItem("pmbp-user"));
   }, []);
 
+  // Clear printer reveal after animation finishes
+  useEffect(() => {
+    if (printReveal && items.length > 0) {
+      const timeout = setTimeout(() => setPrintReveal(false), items.length * 120 + 800);
+      return () => clearTimeout(timeout);
+    }
+  }, [printReveal, items.length]);
+
   const itemsSum = items.reduce((s, i) => s + i.price, 0);
   const reconciliationDiff = Math.abs(itemsSum - subtotal);
   const showReconciliationWarning = reconciliationDiff > 0.5 && subtotal > 0;
 
   async function handleScan() {
-    if (!payerName.trim() || !payerVenmo.trim() || !fileDataRef.current) return;
+    if (!payerName.trim() || !fileDataRef.current) return;
     setLoading(true);
     setError("");
 
@@ -54,6 +63,7 @@ export default function Home() {
       setTax(r.tax);
       setTip(r.tip);
       setSubtotal(r.subtotal);
+      setPrintReveal(true);
       setStep("review");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -212,38 +222,58 @@ export default function Home() {
               <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
                 Receipt
               </label>
-              <label className="block border border-[var(--border)] rounded-lg p-8 text-center cursor-pointer bg-white hover:border-[var(--text)] transition-colors">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  capture="environment"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <div className="text-[var(--text-secondary)] text-[14px]">
-                  Upload or take a photo
+              {!preview ? (
+                <label className="block border border-[var(--border)] rounded-lg p-8 text-center cursor-pointer bg-white hover:border-[var(--text)] transition-colors">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    capture="environment"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <div className="text-[var(--text-secondary)] text-[14px]">
+                    Upload or take a photo
+                  </div>
+                  <div className="text-[var(--text-tertiary)] text-[12px] mt-1">
+                    JPEG, PNG, or WebP up to 10MB
+                  </div>
+                </label>
+              ) : (
+                <div className="relative inline-flex w-full justify-center">
+                  <img
+                    src={preview}
+                    alt="Receipt preview"
+                    className="rounded-lg max-h-40 object-contain"
+                  />
+                  {!loading && (
+                    <button
+                      onClick={() => {
+                        setPreview(null);
+                        fileDataRef.current = null;
+                        if (fileRef.current) fileRef.current.value = "";
+                      }}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-[var(--text)] text-white text-[14px] flex items-center justify-center hover:opacity-80 transition-opacity"
+                      aria-label="Remove image"
+                    >
+                      &times;
+                    </button>
+                  )}
                 </div>
-                <div className="text-[var(--text-tertiary)] text-[12px] mt-1">
-                  JPEG, PNG, or WebP up to 10MB
-                </div>
-              </label>
-              {preview && (
-                <img
-                  src={preview}
-                  alt="Receipt preview"
-                  className="mt-3 rounded-lg max-h-40 object-contain w-full"
-                />
               )}
             </div>
 
-            <button
-              onClick={handleScan}
-              disabled={loading || !payerName.trim() || !payerVenmo.trim() || !fileDataRef.current}
-              className="w-full py-4 rounded bg-[var(--text)] text-white font-medium text-[15px] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity active:scale-[0.99]"
-            >
-              {loading ? "Scanning receipt..." : "Scan Receipt"}
-            </button>
+            {loading ? (
+              <p className="text-[14px] text-[var(--text-secondary)] text-center py-4">Scanning receipt&hellip;</p>
+            ) : (
+              <button
+                onClick={handleScan}
+                disabled={!payerName.trim() || !fileDataRef.current}
+                className="w-full py-4 rounded bg-[var(--text)] text-white font-medium text-[15px] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity active:scale-[0.99]"
+              >
+                Scan Receipt
+              </button>
+            )}
 
             <div className="flex items-center gap-4">
               <div className="flex-1 h-px bg-[var(--border)]" />
@@ -253,8 +283,8 @@ export default function Home() {
 
             <button
               onClick={() => {
-                if (!payerName.trim() || !payerVenmo.trim()) {
-                  setError("Please enter your name and Venmo handle first.");
+                if (!payerName.trim()) {
+                  setError("Please enter your name first.");
                   return;
                 }
                 setError("");
@@ -285,8 +315,12 @@ export default function Home() {
             )}
 
             <div>
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 py-3 border-b border-[var(--border-light)]">
+              {items.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className={`flex items-center gap-2 py-3 border-b border-[var(--border-light)]${printReveal ? " print-item" : ""}`}
+                  style={printReveal ? { animationDelay: `${idx * 120}ms` } : undefined}
+                >
                   <input
                     type="text"
                     value={item.name}
@@ -322,7 +356,10 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 border-t border-[var(--border-light)]">
+            <div
+              className={`grid grid-cols-2 border-t border-[var(--border-light)]${printReveal ? " print-item" : ""}`}
+              style={printReveal ? { animationDelay: `${items.length * 120 + 100}ms` } : undefined}
+            >
               <div className="py-3 pr-4 border-r border-[var(--border-light)]">
                 <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-1">Tax</label>
                 <div className="flex items-center">
@@ -354,19 +391,31 @@ export default function Home() {
             </div>
 
             <div className="space-y-1.5 pt-2 border-t border-[var(--border-light)]">
-              <div className="flex justify-between text-[14px] text-[var(--text-secondary)]">
+              <div
+                className={`flex justify-between text-[14px] text-[var(--text-secondary)]${printReveal ? " print-item" : ""}`}
+                style={printReveal ? { animationDelay: `${items.length * 120 + 220}ms` } : undefined}
+              >
                 <span>Subtotal</span>
                 <span className="font-medium text-[var(--text)] tabular-nums">{formatCurrency(itemsSum)}</span>
               </div>
-              <div className="flex justify-between text-[14px] text-[var(--text-secondary)]">
+              <div
+                className={`flex justify-between text-[14px] text-[var(--text-secondary)]${printReveal ? " print-item" : ""}`}
+                style={printReveal ? { animationDelay: `${items.length * 120 + 340}ms` } : undefined}
+              >
                 <span>Tax</span>
                 <span className="font-medium text-[var(--text)] tabular-nums">{formatCurrency(tax)}</span>
               </div>
-              <div className="flex justify-between text-[14px] text-[var(--text-secondary)]">
+              <div
+                className={`flex justify-between text-[14px] text-[var(--text-secondary)]${printReveal ? " print-item" : ""}`}
+                style={printReveal ? { animationDelay: `${items.length * 120 + 460}ms` } : undefined}
+              >
                 <span>Tip</span>
                 <span className="font-medium text-[var(--text)] tabular-nums">{formatCurrency(tip)}</span>
               </div>
-              <div className="flex justify-between text-[16px] font-semibold pt-2.5 mt-2 border-t border-[var(--text)]">
+              <div
+                className={`flex justify-between text-[16px] font-semibold pt-2.5 mt-2 border-t border-[var(--text)]${printReveal ? " print-item" : ""}`}
+                style={printReveal ? { animationDelay: `${items.length * 120 + 580}ms` } : undefined}
+              >
                 <span>Total</span>
                 <span className="text-[18px] tabular-nums">{formatCurrency(itemsSum + tax + tip)}</span>
               </div>
@@ -440,6 +489,13 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Full-page copier scan overlay */}
+      {loading && step === "upload" && (
+        <div className="copier-overlay-fullpage">
+          <div className="copier-bar" />
+        </div>
+      )}
     </div>
   );
 }
