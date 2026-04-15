@@ -9,49 +9,44 @@ import {
 
 describe("isValidVenmoHandle", () => {
   it("accepts valid handles", () => {
-    expect(isValidVenmoHandle("@alex")).toBe(true);
-    expect(isValidVenmoHandle("@user.name-123")).toBe(true);
+    expect(isValidVenmoHandle("@alex-smith")).toBe(true);
+    expect(isValidVenmoHandle("@a")).toBe(true);
+    expect(isValidVenmoHandle("@user.name_123")).toBe(true);
   });
 
-  it("rejects handles without @", () => {
+  it("rejects invalid handles", () => {
     expect(isValidVenmoHandle("alex")).toBe(false);
-  });
-
-  it("rejects empty string", () => {
+    expect(isValidVenmoHandle("@")).toBe(false);
     expect(isValidVenmoHandle("")).toBe(false);
-  });
-
-  it("rejects handles over 50 chars", () => {
     expect(isValidVenmoHandle("@" + "a".repeat(51))).toBe(false);
   });
 });
 
 describe("isValidPrice", () => {
-  it("accepts zero and positive numbers", () => {
+  it("accepts valid prices", () => {
     expect(isValidPrice(0)).toBe(true);
-    expect(isValidPrice(9.99)).toBe(true);
+    expect(isValidPrice(12.99)).toBe(true);
+    expect(isValidPrice(0.01)).toBe(true);
   });
 
-  it("rejects negative numbers", () => {
+  it("rejects invalid prices", () => {
     expect(isValidPrice(-1)).toBe(false);
-  });
-
-  it("rejects NaN and Infinity", () => {
     expect(isValidPrice(NaN)).toBe(false);
     expect(isValidPrice(Infinity)).toBe(false);
   });
 });
 
 describe("isValidFraction", () => {
-  it("accepts values between 0 and 1", () => {
+  it("accepts valid fractions", () => {
     expect(isValidFraction(0)).toBe(true);
     expect(isValidFraction(0.5)).toBe(true);
     expect(isValidFraction(1)).toBe(true);
   });
 
-  it("rejects values outside 0-1", () => {
+  it("rejects invalid fractions", () => {
     expect(isValidFraction(-0.1)).toBe(false);
     expect(isValidFraction(1.1)).toBe(false);
+    expect(isValidFraction(NaN)).toBe(false);
   });
 });
 
@@ -64,19 +59,21 @@ describe("isValidImageType", () => {
 
   it("rejects other types", () => {
     expect(isValidImageType("image/gif")).toBe(false);
+    expect(isValidImageType("application/pdf")).toBe(false);
     expect(isValidImageType("text/plain")).toBe(false);
   });
 });
 
 describe("isValidImageSize", () => {
-  it("accepts sizes up to 10MB", () => {
+  it("accepts valid sizes", () => {
     expect(isValidImageSize(1)).toBe(true);
+    expect(isValidImageSize(5 * 1024 * 1024)).toBe(true);
     expect(isValidImageSize(10 * 1024 * 1024)).toBe(true);
   });
 
-  it("rejects zero, negative, and over 10MB", () => {
+  it("rejects invalid sizes", () => {
     expect(isValidImageSize(0)).toBe(false);
-    expect(isValidImageSize(-1)).toBe(false);
     expect(isValidImageSize(10 * 1024 * 1024 + 1)).toBe(false);
+    expect(isValidImageSize(-1)).toBe(false);
   });
 });
