@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const trimmedName = name.trim();
+    const trimmedName = name.trim().slice(0, 100);
 
     const updated = await updateReceipt(receiptId, (receipt) => {
       const item = receipt.items.find((i) => i.id === itemId);
       if (!item) throw new Error("Item not found");
 
-      // Remove existing claim by this person
-      item.claims = item.claims.filter((c) => c.name !== trimmedName);
+      // Remove existing claim by this person (case-insensitive)
+      item.claims = item.claims.filter((c) => c.name.toLowerCase() !== trimmedName.toLowerCase());
 
       // If fraction is 0, just unclaim (already removed above)
       if (fraction > 0) {
