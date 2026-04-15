@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { payerName, payerVenmo, items, tax, tip, subtotal } = body;
 
-    if (!payerName?.trim() || !payerVenmo?.trim()) {
+    if (!payerName?.trim()) {
       return NextResponse.json(
-        { error: "Name and Venmo handle are required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const receipt: Receipt = {
       id,
       payerName: payerName.trim(),
-      payerVenmo: payerVenmo.trim(),
+      payerVenmo: payerVenmo?.trim() || "",
       items: sanitizedItems,
       tax: sanitizedTax,
       tip: sanitizedTip,
