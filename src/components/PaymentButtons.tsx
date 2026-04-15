@@ -19,6 +19,8 @@ export default function PaymentButtons({
 
   if (amount <= 0) return null;
 
+  const hasVenmo = payerVenmo.trim().length > 0;
+
   const venmoHandle = payerVenmo.startsWith("@")
     ? payerVenmo.slice(1)
     : payerVenmo;
@@ -54,13 +56,15 @@ export default function PaymentButtons({
 
   return (
     <div className="space-y-2.5">
-      <a
-        href={venmoUrl}
-        onClick={handleVenmoClick}
-        className="flex items-center justify-center w-full py-4 rounded bg-[var(--success)] text-white font-medium text-[15px] hover:opacity-90 transition-opacity active:scale-[0.99]"
-      >
-        Pay {payerName} {formatCurrency(amount)} on Venmo
-      </a>
+      {hasVenmo && (
+        <a
+          href={venmoUrl}
+          onClick={handleVenmoClick}
+          className="flex items-center justify-center w-full py-4 rounded bg-[var(--success)] text-white font-medium text-[15px] hover:opacity-90 transition-opacity active:scale-[0.99]"
+        >
+          Pay {payerName} {formatCurrency(amount)} on Venmo
+        </a>
+      )}
 
       {showFallback && (
         <div className="text-center py-3 px-4 rounded border border-[var(--border)] bg-white">

@@ -59,12 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!payerVenmo?.trim()) {
-      return NextResponse.json(
-        { error: "Please enter your Venmo handle" },
-        { status: 400 }
-      );
-    }
+    // payerVenmo is optional
 
     // Convert image to base64
     const bytes = await image.arrayBuffer();
@@ -170,7 +165,7 @@ export async function POST(request: NextRequest) {
     const receipt: Receipt = {
       id,
       payerName: payerName.trim(),
-      payerVenmo: payerVenmo.trim(),
+      payerVenmo: payerVenmo?.trim() || "",
       description: description?.trim().slice(0, 200) || undefined,
       items,
       tax,
