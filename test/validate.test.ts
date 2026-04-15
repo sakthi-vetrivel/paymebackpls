@@ -18,7 +18,7 @@ describe("isValidVenmoHandle", () => {
     expect(isValidVenmoHandle("alex")).toBe(false);
     expect(isValidVenmoHandle("@")).toBe(false);
     expect(isValidVenmoHandle("")).toBe(false);
-    expect(isValidVenmoHandle("@a".repeat(60))).toBe(false);
+    expect(isValidVenmoHandle("@" + "a".repeat(51))).toBe(false);
   });
 });
 
@@ -60,6 +60,7 @@ describe("isValidImageType", () => {
   it("rejects other types", () => {
     expect(isValidImageType("image/gif")).toBe(false);
     expect(isValidImageType("application/pdf")).toBe(false);
+    expect(isValidImageType("text/plain")).toBe(false);
   });
 });
 
@@ -72,7 +73,7 @@ describe("isValidImageSize", () => {
 
   it("rejects invalid sizes", () => {
     expect(isValidImageSize(0)).toBe(false);
-    expect(isValidImageSize(11 * 1024 * 1024)).toBe(false);
+    expect(isValidImageSize(10 * 1024 * 1024 + 1)).toBe(false);
     expect(isValidImageSize(-1)).toBe(false);
   });
 });
