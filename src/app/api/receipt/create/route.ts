@@ -9,7 +9,7 @@ const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 8);
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { payerName, payerVenmo, items, tax, tip, subtotal } = body;
+    const { payerName, payerVenmo, description, items, tax, tip, subtotal } = body;
 
     if (!payerName?.trim() || !payerVenmo?.trim()) {
       return NextResponse.json(
@@ -51,12 +51,14 @@ export async function POST(request: NextRequest) {
       id,
       payerName: payerName.trim(),
       payerVenmo: payerVenmo.trim(),
+      description: typeof description === "string" ? description.trim().slice(0, 200) : undefined,
       items: sanitizedItems,
       tax: sanitizedTax,
       tip: sanitizedTip,
       subtotal: calculatedSubtotal,
       total,
       createdAt: new Date().toISOString(),
+      paidBy: [],
     };
 
     await setReceipt(receipt);

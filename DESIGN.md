@@ -32,7 +32,7 @@
 - **Surface/cards:** `#FFFFFF`
 - **Text primary:** `#111111`
 - **Text secondary:** `#6B6B6B`
-- **Text tertiary:** `#A3A3A3`
+- **Text tertiary:** `#787878`
 - **Accent/CTA:** `#111111` (black — the buttons are black)
 - **Claimed highlight bg:** `#F0EDE7` (warm tan)
 - **Claimed border:** `#111111` (2px left border)
@@ -40,6 +40,7 @@
 - **Border light:** `#EDEBE7`
 - **Success (Venmo):** `#1A7F37`
 - **Danger:** `#CF222E`
+- **Warning:** `#92600A`
 - **No dark mode** — ephemeral 30-second interaction, one mode done well
 
 ## Spacing
@@ -83,3 +84,7 @@
 | 2026-04-14 | Instrument Serif for display | Gives the app personality without decoration. Serif totals are distinctive in the payment app space. |
 | 2026-04-14 | Almost monochrome palette | No brand accent color. Black CTAs, warm neutrals, semantic green/red only. Restraint IS the brand. |
 | 2026-04-14 | No dark mode | 30-second ephemeral interaction. One mode, done perfectly. |
+| 2026-04-14 | Tertiary text darkened to #787878 | #A3A3A3 failed WCAG AA contrast (2.33:1) on all backgrounds. #787878 passes 4.5:1 while preserving 3-tier hierarchy. |
+| 2026-04-14 | Dynamic OG metadata for shared links | Product's distribution is link sharing. Bare URLs in iMessage look like spam. Dynamic preview shows payer name + bill description. |
+| 2026-04-14 | Per-item tap affordance (+ icon) | Unclaimed items looked like plain text. Small circle with "+" makes claim interaction discoverable. Checkmark when claimed. |
+| 2026-04-14 | Mark as paid + per-person summary | Closes emotional loop after Venmo payment. Gives payer visibility into who has paid. |

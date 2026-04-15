@@ -15,6 +15,7 @@ export default function PaymentButtons({
   amount,
 }: PaymentButtonsProps) {
   const [copied, setCopied] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
   if (amount <= 0) return null;
 
@@ -34,24 +35,40 @@ export default function PaymentButtons({
     setTimeout(() => setCopied(false), 2000);
   }
 
+  function handleVenmoClick() {
+    // Try deep link, fallback to web after delay
+    setTimeout(() => {
+      // If we're still on the page after 1.5s, deep link probably failed
+      setShowFallback(true);
+      window.location.href = venmoWebUrl;
+    }, 1500);
+  }
+
   return (
     <div className="space-y-2.5">
       <a
         href={venmoUrl}
-        onClick={() => {
-          setTimeout(() => {
-            window.location.href = venmoWebUrl;
-          }, 500);
-        }}
+        onClick={handleVenmoClick}
         className="flex items-center justify-center w-full py-4 rounded bg-[var(--success)] text-white font-medium text-[15px] hover:opacity-90 transition-opacity active:scale-[0.99]"
       >
         Pay {payerName} {formatCurrency(amount)} on Venmo
       </a>
+
+      {showFallback && (
+        <div className="text-center py-3 px-4 rounded border border-[var(--border)] bg-white">
+          <p className="text-[13px] text-[var(--text-secondary)]">
+            Having trouble? Send {formatCurrency(amount)} to{" "}
+            <span className="font-medium text-[var(--text)]">@{venmoHandle}</span>{" "}
+            on Venmo manually.
+          </p>
+        </div>
+      )}
+
       <button
         onClick={copyAmount}
         className="flex items-center justify-center w-full py-3 text-[var(--text-secondary)] font-medium text-[13px] hover:text-[var(--text)] transition-colors"
       >
-        {copied ? "Copied!" : "Copy amount"}
+        {copied ? "Copied!" : `Copy amount (${formatCurrency(amount)})`}
       </button>
     </div>
   );
