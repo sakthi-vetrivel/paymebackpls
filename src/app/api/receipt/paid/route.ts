@@ -6,17 +6,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { receiptId, name } = body;
 
-    if (!receiptId || !name?.trim()) {
+    if (typeof receiptId !== "string" || !receiptId || !name?.trim()) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const trimmedName = name.trim();
+    const trimmedName = name.trim().slice(0, 100);
 
     const updated = await updateReceipt(receiptId, (receipt) => {
       const paidBy = receipt.paidBy || [];
-      if (paidBy.includes(trimmedName)) {
+      const match = paidBy.find((n) => n.toLowerCase() === trimmedName.toLowerCase());
+      if (match) {
         // Toggle off
-        receipt.paidBy = paidBy.filter((n) => n !== trimmedName);
+        receipt.paidBy = paidBy.filter((n) => n.toLowerCase() !== trimmedName.toLowerCase());
       } else {
         receipt.paidBy = [...paidBy, trimmedName];
       }

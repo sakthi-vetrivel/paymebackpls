@@ -37,11 +37,19 @@ export default function PaymentButtons({
 
   function handleVenmoClick() {
     // Try deep link, fallback to web after delay
-    setTimeout(() => {
-      // If we're still on the page after 1.5s, deep link probably failed
+    const timer = setTimeout(() => {
       setShowFallback(true);
       window.location.href = venmoWebUrl;
     }, 1500);
+
+    // If Venmo app opens, page gets hidden — cancel the fallback
+    function onVisibilityChange() {
+      if (document.hidden) {
+        clearTimeout(timer);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
   }
 
   return (
