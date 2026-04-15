@@ -37,7 +37,7 @@ export function isFullyClaimed(item: ReceiptItem): boolean {
 }
 
 export function getClaimByName(item: ReceiptItem, name: string): Claim | undefined {
-  return item.claims.find((c) => c.name === name);
+  return item.claims.find((c) => c.name.toLowerCase() === name.toLowerCase());
 }
 
 export function calculateShare(

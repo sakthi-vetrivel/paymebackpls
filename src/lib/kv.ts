@@ -1,28 +1,65 @@
 import { Receipt } from "./receipt";
+import { createServerClient } from "./supabase";
 
-// In-memory store for development (replace with Vercel KV in production)
-const store = new Map<string, { data: Receipt; expiresAt: number }>();
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+interface ReceiptRow {
+  id: string;
+  creator_id: string | null;
+  payer_name: string;
+  payer_venmo: string;
+  items: Receipt["items"];
+  tax: number;
+  tip: number;
+  subtotal: number;
+  total: number;
+  created_at: string;
+  expires_at: string;
+}
+
+function rowToReceipt(row: ReceiptRow): Receipt {
+  return {
+    id: row.id,
+    payerName: row.payer_name,
+    payerVenmo: row.payer_venmo,
+    items: row.items,
+    tax: Number(row.tax),
+    tip: Number(row.tip),
+    subtotal: Number(row.subtotal),
+    total: Number(row.total),
+    createdAt: row.created_at,
+  };
+}
 
 export async function getReceipt(id: string): Promise<Receipt | null> {
-  const key = `receipt:${id}`;
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from("receipts")
+    .select("*")
+    .eq("id", id)
+    .gt("expires_at", new Date().toISOString())
+    .single();
 
-  // Check in-memory store
-  const entry = store.get(key);
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    store.delete(key);
-    return null;
-  }
-  return entry.data;
+  if (error || !data) return null;
+  return rowToReceipt(data as ReceiptRow);
 }
 
 export async function setReceipt(receipt: Receipt): Promise<void> {
-  const key = `receipt:${receipt.id}`;
-  store.set(key, {
-    data: receipt,
-    expiresAt: Date.now() + SEVEN_DAYS_MS,
+  const supabase = createServerClient();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await supabase.from("receipts").upsert({
+    id: receipt.id,
+    payer_name: receipt.payerName,
+    payer_venmo: receipt.payerVenmo,
+    items: receipt.items,
+    tax: receipt.tax,
+    tip: receipt.tip,
+    subtotal: receipt.subtotal,
+    total: receipt.total,
+    created_at: receipt.createdAt,
+    expires_at: expiresAt,
   });
+
+  if (error) throw new Error(`Failed to save receipt: ${error.message}`);
 }
 
 export async function updateReceipt(
@@ -34,4 +71,31 @@ export async function updateReceipt(
   const updated = updater(receipt);
   await setReceipt(updated);
   return updated;
+}
+
+export async function linkReceiptToUser(
+  receiptId: string,
+  userId: string
+): Promise<boolean> {
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("receipts")
+    .update({ creator_id: userId })
+    .eq("id", receiptId)
+    .is("creator_id", null);
+
+  return !error;
+}
+
+export async function getReceiptsByUser(userId: string): Promise<Receipt[]> {
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from("receipts")
+    .select("*")
+    .eq("creator_id", userId)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+  return (data as ReceiptRow[]).map(rowToReceipt);
 }

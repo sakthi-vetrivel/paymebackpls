@@ -152,7 +152,7 @@ export default function FriendView({ id }: FriendViewProps) {
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
             <h1 className="font-[family-name:var(--font-instrument-serif)] text-[22px] font-normal">
-              pay{receipt.payerName}backpls
+              pay<span className="font-bold underline">{receipt.payerName}</span>backpls
             </h1>
             <p className="text-[14px] text-[var(--text-secondary)] mt-1">
               {receipt.payerName} shared a receipt with you
@@ -200,7 +200,7 @@ export default function FriendView({ id }: FriendViewProps) {
         {/* Header */}
         <div className="text-center">
           <div className="font-[family-name:var(--font-instrument-serif)] text-[22px] font-normal text-[var(--text)]">
-            pay{receipt.payerName}backpls
+            pay<span className="font-bold underline">{receipt.payerName}</span>backpls
           </div>
           {receipt.description && (
             <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
