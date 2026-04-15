@@ -167,20 +167,20 @@ export default function Home() {
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center px-6 py-10">
+    <div className="flex-1 flex flex-col items-center px-6">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="font-[family-name:var(--font-instrument-serif)] text-[22px] font-normal text-[var(--text)]">
-            pay<span className="font-bold underline">{payerName || "me"}</span>backpls
+        <div className="text-center pt-[88px] mb-16">
+          <h1 className="font-[family-name:var(--font-instrument-serif)] text-[38px] font-normal text-[var(--text)] leading-tight tracking-[-0.01em]">
+            pay<span className="font-bold underline underline-offset-[3px] decoration-[1.5px]">{payerName || "me"}</span>backpls
           </h1>
-          <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
+          <p className="text-[12px] text-[var(--text-secondary)] mt-3 tracking-[0.02em]">
             Split the bill, keep the friendship.
           </p>
           {hasAccount && (
             <a
               href="/receipts"
-              className="inline-block text-[12px] text-[var(--text-secondary)] mt-2 underline underline-offset-2 hover:text-[var(--text)] transition-colors"
+              className="inline-block text-[12px] text-[var(--text-secondary)] mt-3 underline underline-offset-[3px] decoration-[1px] hover:text-[var(--text)] hover:decoration-[var(--text)] transition-colors"
             >
               My Receipts
             </a>
@@ -188,59 +188,62 @@ export default function Home() {
         </div>
 
         {error && (
-          <div className="text-[var(--danger)] text-[13px] py-3 px-4 mb-4 border border-[var(--danger)]/20 rounded bg-red-50/50">
+          <div className="text-[var(--danger)] text-[13px] py-3 px-4 mb-6 border border-[var(--danger)]/20 rounded bg-red-50/50">
             {error}
           </div>
         )}
 
         {/* Step 1: Upload */}
         {step === "upload" && (
-          <div className="space-y-5">
-            <div>
-              <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
+          <div className="flex flex-col gap-[44px]">
+            <div className="relative">
+              <label
+                className={`absolute -top-[18px] left-0 text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.08em] transition-opacity duration-200 ${payerName ? "opacity-100" : "opacity-0"}`}
+              >
                 Your name
               </label>
               <input
                 type="text"
                 value={payerName}
                 onChange={(e) => setPayerName(e.target.value)}
-                placeholder="Alex"
-                className="w-full py-3.5 border-b border-[var(--border)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-tertiary)]"
+                placeholder="Your name"
+                className="w-full py-2 pb-3 border-b border-[var(--border-light)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-secondary)] placeholder:font-light"
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
+            <div className="relative">
+              <label
+                className={`absolute -top-[18px] left-0 text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.08em] transition-opacity duration-200 ${payerVenmo ? "opacity-100" : "opacity-0"}`}
+              >
                 Venmo
               </label>
               <input
                 type="text"
                 value={payerVenmo}
                 onChange={(e) => setPayerVenmo(e.target.value)}
-                placeholder="@alex-smith"
-                className="w-full py-3.5 border-b border-[var(--border)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-tertiary)]"
+                placeholder="@venmo"
+                className="w-full py-2 pb-3 border-b border-[var(--border-light)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-secondary)] placeholder:font-light"
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
-                What&apos;s this for?
+            <div className="relative">
+              <label
+                className={`absolute -top-[18px] left-0 text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.08em] transition-opacity duration-200 ${description ? "opacity-100" : "opacity-0"}`}
+              >
+                Occasion
               </label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Dinner at Spago"
-                className="w-full py-3.5 border-b border-[var(--border)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-tertiary)]"
+                placeholder="What&apos;s this for?"
+                className="w-full py-2 pb-3 border-b border-[var(--border-light)] bg-transparent text-[16px] focus:outline-none focus:border-[var(--text)] transition-colors placeholder:text-[var(--text-secondary)] placeholder:font-light"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-[0.1em] mb-2">
-                Receipt
-              </label>
               {!preview ? (
-                <label className="block border border-[var(--border)] rounded-lg p-8 text-center cursor-pointer bg-white hover:border-[var(--text)] transition-colors">
+                <label className="block border border-dashed border-[var(--border)] rounded p-12 text-center cursor-pointer hover:border-[var(--text)] transition-colors">
                   <input
                     ref={fileRef}
                     type="file"
@@ -250,10 +253,7 @@ export default function Home() {
                     className="hidden"
                   />
                   <div className="text-[var(--text-secondary)] text-[14px]">
-                    Upload or take a photo
-                  </div>
-                  <div className="text-[var(--text-tertiary)] text-[12px] mt-1">
-                    JPEG, PNG, or WebP up to 10MB
+                    Upload receipt
                   </div>
                 </label>
               ) : (
@@ -261,7 +261,7 @@ export default function Home() {
                   <img
                     src={preview}
                     alt="Receipt preview"
-                    className="rounded-lg max-h-40 object-contain"
+                    className="rounded max-h-40 object-contain"
                   />
                   {!loading && (
                     <button
@@ -286,17 +286,13 @@ export default function Home() {
               <button
                 onClick={handleScan}
                 disabled={!payerName.trim() || !fileDataRef.current}
-                className="w-full py-4 rounded bg-[var(--text)] text-white font-medium text-[15px] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity active:scale-[0.99]"
+                className="w-full py-[18px] rounded bg-[var(--text)] text-white font-medium text-[15px] tracking-[0.01em] hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-[0.99]"
               >
                 Scan Receipt
               </button>
             )}
 
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-[var(--border)]" />
-              <span className="text-[12px] text-[var(--text-tertiary)] uppercase tracking-[0.06em]">or</span>
-              <div className="flex-1 h-px bg-[var(--border)]" />
-            </div>
+            <div className="h-px bg-[var(--border-light)]" />
 
             <button
               onClick={() => {
@@ -311,7 +307,7 @@ export default function Home() {
                 setSubtotal(0);
                 setStep("review");
               }}
-              className="w-full py-4 rounded border border-[var(--border)] text-[var(--text)] font-medium text-[15px] hover:border-[var(--text)] transition-colors active:scale-[0.99]"
+              className="text-[13px] text-[var(--text-secondary)] underline underline-offset-[3px] decoration-[1px] decoration-[var(--text-secondary)] hover:text-[var(--text)] hover:decoration-[var(--text)] transition-colors mx-auto"
             >
               Enter items manually
             </button>

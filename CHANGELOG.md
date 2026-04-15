@@ -2,6 +2,11 @@
 
 All notable changes to paymebackpls will be documented in this file.
 
+## [0.1.1.0] - 2026-04-15
+
+### Changed
+- Upload page redesigned with editorial minimal aesthetic: larger 38px brand typography, floating labels that appear when fields have content, 44px gaps between form fields, minimal dashed upload zone, and "Enter items manually" as an underlined text link instead of a bordered button
+
 ## [0.1.0.0] - 2026-04-14
 
 ### Added
