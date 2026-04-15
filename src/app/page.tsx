@@ -245,7 +245,6 @@ export default function Home() {
                     ref={fileRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    capture="environment"
                     onChange={handleFileChange}
                     className="hidden"
                   />
