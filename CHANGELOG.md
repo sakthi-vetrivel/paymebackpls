@@ -2,6 +2,11 @@
 
 All notable changes to paymebackpls will be documented in this file.
 
+## [0.1.0.1] - 2026-04-15
+
+### Fixed
+- Mobile users can now choose an existing photo from their gallery instead of being forced to use the camera
+
 ## [0.1.0.0] - 2026-04-14
 
 ### Added
