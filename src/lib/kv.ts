@@ -93,6 +93,7 @@ export async function getReceiptsByUser(userId: string): Promise<Receipt[]> {
     .from("receipts")
     .select("*")
     .eq("creator_id", userId)
+    .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
