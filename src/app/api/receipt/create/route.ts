@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     const id = nanoid();
     const receipt: Receipt = {
       id,
-      payerName: payerName.trim(),
-      payerVenmo: payerVenmo.trim(),
+      payerName: payerName.trim().slice(0, 100),
+      payerVenmo: payerVenmo.trim().slice(0, 50),
       items: sanitizedItems,
       tax: sanitizedTax,
       tip: sanitizedTip,

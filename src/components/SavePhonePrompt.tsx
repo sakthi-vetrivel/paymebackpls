@@ -70,11 +70,14 @@ export default function SavePhonePrompt({ receiptId }: SavePhonePromptProps) {
       localStorage.setItem("pmbp-user", JSON.stringify(data.user));
 
       // Link this receipt to the user
-      await fetch("/api/receipt/link", {
+      const linkRes = await fetch("/api/receipt/link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ receiptId, accessToken: data.session.access_token }),
       });
+      if (!linkRes.ok) {
+        console.error("Failed to link receipt:", await linkRes.text());
+      }
 
       setStep("done");
     } catch (e) {

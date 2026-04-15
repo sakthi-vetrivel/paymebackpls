@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getReceiptsByUser } from "@/lib/kv";
 
 export async function GET(request: NextRequest) {
-  const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
+  const accessToken = request.headers.get("authorization")?.replace(/^Bearer /i, "");
 
   if (!accessToken) {
     return NextResponse.json(

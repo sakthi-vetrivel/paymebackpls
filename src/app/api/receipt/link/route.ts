@@ -28,14 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     const linked = await linkReceiptToUser(receiptId, user.id);
-    if (!linked) {
-      return NextResponse.json(
-        { error: "Failed to link receipt" },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json({ linked: true });
+    return NextResponse.json({ linked });
   } catch {
     return NextResponse.json(
       { error: "Something went wrong" },

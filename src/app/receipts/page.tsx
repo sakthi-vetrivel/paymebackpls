@@ -7,6 +7,7 @@ export default function MyReceipts() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const sessionStr = localStorage.getItem("pmbp-session");
@@ -31,8 +32,9 @@ export default function MyReceipts() {
       });
       const data = await res.json();
       if (res.ok) setReceipts(data.receipts);
+      else setFetchError(true);
     } catch {
-      // silently fail
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,13 @@ export default function MyReceipts() {
           </a>
         </div>
 
-        {receipts.length === 0 ? (
+        {fetchError ? (
+          <div className="text-center py-12">
+            <p className="text-[14px] text-[var(--text-secondary)]">
+              Couldn&apos;t load receipts. Try refreshing.
+            </p>
+          </div>
+        ) : receipts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-[14px] text-[var(--text-secondary)]">
               No receipts yet. Create one to get started.
