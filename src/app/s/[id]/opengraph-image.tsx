@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getReceipt } from "@/lib/kv";
 
-export const runtime = "edge";
 export const alt = "paymebackpls receipt";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -38,16 +37,18 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         >
           <div
             style={{
+              display: "flex",
               fontSize: "56px",
               fontWeight: 400,
               color: "#111111",
               letterSpacing: "-0.02em",
             }}
           >
-            pay{payerName}backpls
+            {`pay${payerName}backpls`}
           </div>
           <div
             style={{
+              display: "flex",
               fontSize: "28px",
               color: "#6B6B6B",
               marginTop: "8px",
@@ -57,12 +58,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           </div>
           <div
             style={{
+              display: "flex",
               fontSize: "22px",
               color: "#787878",
               marginTop: "4px",
             }}
           >
-            {itemCount} item{itemCount !== 1 ? "s" : ""} to split · tap to claim yours
+            {`${itemCount} item${itemCount !== 1 ? "s" : ""} to split · tap to claim yours`}
           </div>
         </div>
       </div>
