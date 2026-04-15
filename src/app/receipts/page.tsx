@@ -9,24 +9,26 @@ export default function MyReceipts() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    const userStr = localStorage.getItem("pmbp-user");
-    if (!userStr) {
+    const sessionStr = localStorage.getItem("pmbp-session");
+    if (!sessionStr) {
       setLoading(false);
       return;
     }
 
     try {
-      const user = JSON.parse(userStr);
+      const session = JSON.parse(sessionStr);
       setLoggedIn(true);
-      fetchReceipts(user.id);
+      fetchReceipts(session.access_token);
     } catch {
       setLoading(false);
     }
   }, []);
 
-  async function fetchReceipts(userId: string) {
+  async function fetchReceipts(accessToken: string) {
     try {
-      const res = await fetch(`/api/receipts?userId=${userId}`);
+      const res = await fetch("/api/receipts", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       const data = await res.json();
       if (res.ok) setReceipts(data.receipts);
     } catch {

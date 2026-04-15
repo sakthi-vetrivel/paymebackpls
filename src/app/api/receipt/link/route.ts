@@ -1,18 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { linkReceiptToUser } from "@/lib/kv";
 
 export async function POST(request: NextRequest) {
   try {
-    const { receiptId, userId } = await request.json();
+    const { receiptId, accessToken } = await request.json();
 
-    if (!receiptId || !userId) {
+    if (!receiptId || !accessToken) {
       return NextResponse.json(
-        { error: "Receipt ID and user ID are required" },
+        { error: "Receipt ID and access token are required" },
         { status: 400 }
       );
     }
 
-    const linked = await linkReceiptToUser(receiptId, userId);
+    // Verify the token server-side to get the authenticated user
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Invalid or expired session" },
+        { status: 401 }
+      );
+    }
+
+    const linked = await linkReceiptToUser(receiptId, user.id);
     if (!linked) {
       return NextResponse.json(
         { error: "Failed to link receipt" },

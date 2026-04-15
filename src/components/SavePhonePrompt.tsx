@@ -73,7 +73,7 @@ export default function SavePhonePrompt({ receiptId }: SavePhonePromptProps) {
       await fetch("/api/receipt/link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiptId, userId: data.user.id }),
+        body: JSON.stringify({ receiptId, accessToken: data.session.access_token }),
       });
 
       setStep("done");
